@@ -1,0 +1,131 @@
+{
+    "pipeline": {
+        "roleArn": "arn:aws:iam::374262384753:role/service-role/AWSCodePipelineServiceRole-eu-west-1-lambda-pipeline-berlin-tes", 
+        "stages": [
+            {
+                "name": "Source", 
+                "actions": [
+                    {
+                        "inputArtifacts": [], 
+                        "name": "Source", 
+                        "region": "eu-west-1", 
+                        "actionTypeId": {
+                            "category": "Source", 
+                            "owner": "AWS", 
+                            "version": "1", 
+                            "provider": "CodeCommit"
+                        }, 
+                        "outputArtifacts": [
+                            {
+                                "name": "SourceArtifact"
+                            }
+                        ], 
+                        "configuration": {
+                            "PollForSourceChanges": "false", 
+                            "BranchName": "master", 
+                            "RepositoryName": "berlin-test"
+                        }, 
+                        "runOrder": 1
+                    }
+                ]
+            }, 
+            {
+                "name": "Build", 
+                "actions": [
+                    {
+                        "inputArtifacts": [
+                            {
+                                "name": "SourceArtifact"
+                            }
+                        ], 
+                        "name": "Build", 
+                        "region": "eu-west-1", 
+                        "actionTypeId": {
+                            "category": "Build", 
+                            "owner": "AWS", 
+                            "version": "1", 
+                            "provider": "CodeBuild"
+                        }, 
+                        "outputArtifacts": [
+                            {
+                                "name": "BuildArtifact"
+                            }
+                        ], 
+                        "configuration": {
+                            "ProjectName": "lambda-pipeline-build-berlin-test"
+                        }, 
+                        "runOrder": 1
+                    }
+                ]
+            }, 
+            {
+                "name": "Deploy", 
+                "actions": [
+                    {
+                        "inputArtifacts": [
+                            {
+                                "name": "BuildArtifact"
+                            }
+                        ], 
+                        "name": "Deploy", 
+                        "region": "eu-west-1", 
+                        "actionTypeId": {
+                            "category": "Deploy", 
+                            "owner": "AWS", 
+                            "version": "1", 
+                            "provider": "CloudFormation"
+                        }, 
+                        "outputArtifacts": [], 
+                        "configuration": {
+                            "ActionMode": "CHANGE_SET_REPLACE", 
+                            "ChangeSetName": "lambda-pipeline-changeset", 
+                            "RoleArn": "arn:aws:iam::374262384753:role/cfn-lambda-pipeline-berlin-test", 
+                            "Capabilities": "CAPABILITY_IAM", 
+                            "StackName": "lambda-pipeline-stack-berlin-test", 
+                            "TemplatePath": "BuildArtifact::outputtemplate.yml"
+                        }, 
+                        "runOrder": 1
+                    }
+                ]
+            }, 
+            {
+                "name": "execute-changeset", 
+                "actions": [
+                    {
+                        "inputArtifacts": [
+                            {
+                                "name": "BuildArtifact"
+                            }
+                        ], 
+                        "name": "execute-changeset", 
+                        "region": "eu-west-1", 
+                        "actionTypeId": {
+                            "category": "Deploy", 
+                            "owner": "AWS", 
+                            "version": "1", 
+                            "provider": "CloudFormation"
+                        }, 
+                        "outputArtifacts": [], 
+                        "configuration": {
+                            "StackName": "lambda-pipeline-stack-berlin-test", 
+                            "ActionMode": "CHANGE_SET_EXECUTE", 
+                            "ChangeSetName": "lambda-pipeline-changeset"
+                        }, 
+                        "runOrder": 1
+                    }
+                ]
+            }
+        ], 
+        "artifactStore": {
+            "type": "S3", 
+            "location": "codepipeline-eu-west-1-208728665358"
+        }, 
+        "name": "lambda-pipeline-berlin-test", 
+        "version": 2
+    }, 
+    "metadata": {
+        "pipelineArn": "arn:aws:codepipeline:eu-west-1:374262384753:lambda-pipeline-berlin-test", 
+        "updated": 1569690963.084, 
+        "created": 1569689240.075
+    }
+}
