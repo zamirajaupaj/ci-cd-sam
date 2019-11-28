@@ -1,5 +1,4 @@
 # ci-cd-sam
-# ci-cd-sam
 
 [![Join the chat at https://gitter.im/Zamira-Jaupaj/ci-cd-sam](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Zamira-Jaupaj/ci-cd-sam)
 
